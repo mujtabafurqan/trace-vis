@@ -105,3 +105,15 @@ a {
     color-scheme: dark;
   }
 }
+
+
+.node {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 1px;
+}
+
+.link {
+  stroke: #ccc;
+  stroke-width: 1px;
+}
