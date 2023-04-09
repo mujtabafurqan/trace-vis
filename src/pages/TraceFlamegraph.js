@@ -6,7 +6,7 @@ import '@pyroscope/flamegraph/dist/index.css';
 
 const TraceFlamegraph = ({ trace }) => {
   console.log("traceFlamegraph",trace)
-  const convertedProfile = trace && trace.data ? convertJaegerTraceToProfile(trace.data[0]) : null;
+  const convertedProfile = trace ? convertJaegerTraceToProfile(trace) : null;
   console.log("convertedProfile",convertedProfile);
   return (
     <div className="Flamegraph-wrapper">
