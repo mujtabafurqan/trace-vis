@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import * as d3 from "d3";
-import Reactangle from "./Reactangle";
+import Rectangle from "./Reactangle";
 
 function drawChart(){
     var data = {"name": "A", "children": [
@@ -60,7 +60,7 @@ function drawChart(){
         // .append("xhtml:div")
         .style("font", "2px 'Helvetica Neue'")
         .html((d) => {
-            <Reactangle />
+            <Rectangle />
         });
 
 }

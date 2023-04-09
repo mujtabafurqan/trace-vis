@@ -83,6 +83,7 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  background-color: white;
 }
 
 body {
@@ -116,4 +117,8 @@ a {
 .link {
   stroke: #ccc;
   stroke-width: 1px;
+}
+
+.Flamegraph-wrapper {
+  padding: 0 calc(1rem - 5px);
 }
