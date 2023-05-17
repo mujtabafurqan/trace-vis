@@ -14,12 +14,11 @@ const Barchart = ({width=400, height=400, barColor='black', appName, barData, la
         .padding(0.1);
     
     const y = d3.scaleLinear()
-        .domain([0, d3.max(barData)])
+        .domain([0, d3.max(barData)*1.2])
         .range([height, 0]);
     
     return (
         <div>
-            <p style={{color:'black', fontSize:'5px', padding:'0px'}}>{label}</p>
             <svg width={width} height={height}>
             {barData.map((d, i) => (
                 <rect key={i} x={x(i)} y={y(d)} width={x.bandwidth()} height={height - y(d)} fill={barColor} />

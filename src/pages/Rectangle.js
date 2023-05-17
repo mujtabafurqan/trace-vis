@@ -1,6 +1,6 @@
 import Barchart from './Barchart';
 
-export default function Rectangle({ latencyData, appName, barData, router, width = 70, height = 30 }) {
+export default function Rectangle({ latencyData, appName, barData, router, width = 70, height = 50 }) {
   const handleClick = () => {
     console.log('Clicked on rectangle');
     router.push('/serviceDetails');
@@ -8,7 +8,7 @@ export default function Rectangle({ latencyData, appName, barData, router, width
 
   return (
     <div
-      style={{ width: width, height: height+20, border: '1px solid black' }}
+      style={{ width: width, height: height+2, border: '1px solid black' }}
       onClick={() => handleClick()}
     >
       <Barchart
