@@ -1,73 +1,81 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-const data = [
-    { date: new Date("2022-03-01T00:00:00Z"), value: 100 },
-    { date: new Date("2022-03-02T00:00:00Z"), value: 200 },
-    { date: new Date("2022-03-03T00:00:00Z"), value: 150 },
-    { date: new Date("2022-03-04T00:00:00Z"), value: 300 },
-    { date: new Date("2022-03-05T00:00:00Z"), value: 250 },
-    { date: new Date("2022-03-06T00:00:00Z"), value: 350 },
-    { date: new Date("2022-03-07T00:00:00Z"), value: 400 }
-  ];
-
-  
-  const LineChart = ({width = 800, height = 400 }) => {
-    const svgRef = useRef();
-  
-    useEffect(() => {
-      const createChart = () => {
-        const margin = { top: 20, right: 20, bottom: 30, left: 50 };
-        const innerWidth = width - margin.left - margin.right;
-        const innerHeight = height - margin.top - margin.bottom;
-  
+const LineGraph = ({ data, width, height }) => {
+  const svgRef = useRef();
+  useEffect(() => {
+    console.log("In useEffect",data)
+    if(data != null){
         const svg = d3.select(svgRef.current);
-  
-        const x = d3
-          .scaleTime()
-          .domain(d3.extent(data, (d) => d.timestamp))
-          .range([0, innerWidth]);
-  
-        const y = d3
-          .scaleLinear()
-          .domain([0, d3.max(data, (d) => d.requests)])
-          .range([innerHeight, 0]);
-  
-        const xAxis = d3.axisBottom(x).ticks(6);
-        const yAxis = d3.axisLeft(y).ticks(6);
-  
+        console.log("Linedata",data)
+        // Set up scales for the x and y axis
+        const xScale = d3
+        .scaleTime()
+        .domain(d3.extent(data, (d) => d.date))
+        .range([0, width]);
+        const yScale = d3
+        .scaleLinear()
+        .domain([0, d3.max(data, (d) => d.value)])
+        .range([height, 0]);
+
+        // Set up axis for the x and y axis
+        const xAxis = d3.axisTop().scale(xScale).ticks(10).tickFormat(d3.timeFormat('%I:%M %p'));
+        const yAxis = d3.axisRight().scale(yScale).ticks(10);
+
+
+        svg.selectAll('.tick line').attr('stroke', 'lightgray'); // Change the color of the tick marks
+        svg.selectAll('.tick text').attr('fill', 'gray'); // Change the color of the tick labels
+        // Add the x-axis to the svg
         svg
-          .append('g')
-          .attr('transform', `translate(0,${innerHeight})`)
-          .call(xAxis);
-  
-        svg.append('g').call(yAxis);
-  
+        .select('.x-axis')
+        .attr('transform', `translate(0, ${height})`)
+        .call(xAxis);
+
+        // Add the y-axis to the svg
+        svg.select('.y-axis').call(yAxis);
+
+        // Draw the line for the graph
         const line = d3
-          .line()
-          .x((d) => x(d.timestamp))
-          .y((d) => y(d.requests));
-  
+        .line()
+        .x((d) => xScale(d.date))
+        .y((d) => yScale(d.value));
+
         svg
-          .append('path')
-          .datum(data)
-          .attr('fill', 'none')
-          .attr('stroke', 'steelblue')
-          .attr('stroke-width', 1.5)
-          .attr('d', line);
-      };
-  
-      createChart();
-    }, [data, height, width]);
-  
-    return (
-      <svg
-        ref={svgRef}
-        width={width}
-        height={height}
-        style={{ border: '1px solid black' }}
-      />
-    );
-  };
-  
-  export default LineChart;
+        .select('.line')
+        .datum(data)
+        .attr('d', line)
+        .attr('fill', 'none')
+        .attr('stroke', 'steelblue')
+        .attr('stroke-width', 2);
+
+        // Add labels to the x and y axis
+        svg
+        .append('text')
+        .attr('class', 'x label')
+        .attr('text-anchor', 'end')
+        .attr('x', width)
+        .attr('y', height + 40)
+        .text('Date');
+
+        svg
+        .append('text')
+        .attr('class', 'y label')
+        .attr('text-anchor', 'end')
+        .attr('y', -50)
+        .attr('dy', '.75em')
+        .attr('transform', 'rotate(-90)')
+        .text('Value');
+
+    }
+  }, [data, height, width]);
+
+  return (
+    <svg width={width} height={height} ref={svgRef}>
+      <g className="x-axis" />
+      <g className="y-axis" />
+      <path className="line" />
+    </svg>
+  );
+};
+
+export default LineGraph;
