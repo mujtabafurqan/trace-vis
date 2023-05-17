@@ -38,7 +38,7 @@ const Service = () => {
       </Head>
       <div class="flex flex-col">
         <div class="flex p-10">
-            <div class="px-5">
+            <div class="px-5 w-650 h-450">
                 <h1 class="text-xl font-semibold px-10">Request Rate Last hour</h1>
                 <LineChart data={requestsLineData} width={600} height={400} margin={{ top: 20, right: 30, bottom: 30, left: 40 }} />
             </div>

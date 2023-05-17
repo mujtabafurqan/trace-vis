@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import * as d3 from 'd3';
 import ReactDOMServer from 'react-dom/server';
 import Rectangle from './Rectangle';
@@ -35,7 +35,7 @@ const getLinks = async () => {
   return links;
 }
 
-const createSvg = async (container, data, width, height, router) => {
+const createSvg = async (container, data, width, height, router, setShowPopup, showPopup, setPopupData) => {
     var margin = {top: 20, right: 30, bottom: 20, left: 30},
         width = height - margin.left - margin.right,
         height = width - margin.top - margin.bottom;
@@ -69,14 +69,21 @@ const createSvg = async (container, data, width, height, router) => {
             .enter()
             .append("foreignObject")
             .attr("x", (width/2)-75)
-            .attr("y", function(d){ return(x(d.name))*1.5})
+            .attr("y", function(d){ return(x(d.name))})
             .attr("class", "component")
             .attr("width", 70)
             .attr("height", 50)
+            .attr("class", "component cursor-pointer")
             .html((d) => ReactDOMServer.renderToString(d.component))
-            .on("click", function(d, i) {
-                router.push(`/service/${i.id}`);
+            .on("click", async function(d, i) {
+              
+              const latencyData  = await getLatenciesLastHourBarChart(i.id);
+              const barData = await getRequestsLastHourBarChart(i.id);
+              const appName = i.id;
+              setPopupData({latencyData, barData, appName});
+              setShowPopup(!showPopup);
             })
+            
 
         // And give them a label
         svg
@@ -84,8 +91,8 @@ const createSvg = async (container, data, width, height, router) => {
             .data(dummyData.nodes)
             .enter()
             .append("text")
-            .attr("x", 130)
-            .attr("y", function(d){ return((x(d.name))*1.5)+30})
+            .attr("x", 270)
+            .attr("y", function(d){ return((x(d.name)))+30})
             .text(function(d){ return(d.name)})
             .style("text-anchor", "middle")
 
@@ -106,11 +113,11 @@ const createSvg = async (container, data, width, height, router) => {
             .attr('d', function (d) {
                 const start = x(idToNode[d.source].name)    // Y position of start node on the Y axis
                 const end = x(idToNode[d.target].name)      // Y position of end node
-                return ['M', 290, start+30,    // the arc starts at the coordinate x=30, y=start (where the starting node is)
+                return ['M', 465, start+30,    // the arc starts at the coordinate x=30, y=start (where the starting node is)
                         'A',                            // This means we're gonna build an elliptical arc
                         (end - start)/2, ',',    // Next 2 lines are the coordinates of the inflexion point. Width of this point is proportional with end - start distance
                         (end - start)/2, 0, 0, ',',
-                        start < end ? 1 : 0, 290, ',', end+30] // We always want the arc on left. So if end is before start, putting 0 here turn the arc to the left.
+                        start < end ? 1 : 0, 465, ',', end+30] // We always want the arc on left. So if end is before start, putting 0 here turn the arc to the left.
                         .join(' ');
             })
             .style("fill", "none")
@@ -119,25 +126,61 @@ const createSvg = async (container, data, width, height, router) => {
       }
   
 
-const ArcDiagram = ({ data ={}, width = 1100, height = 650 }) => {
+const ArcDiagram = ({ data ={}, width = 1200, height = 1000 }) => {
   const router = useRouter();
   const svgRef = useRef();
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupData, setPopupData] = useState({});
 
-  React.useEffect(() => {
+  const closePopup = () => {
+    setShowPopup(false);
+  }
 
+  const exploreClick = () => {
+    router.push(`/service/${popupData.appName}`);
+  }
+
+  React.useEffect(() => {    
     const constructSVG = async () =>{
       data.nodes = await getNodes();
       data.links = await getLinks();
       console.log("In Use Effect",data);
 
       d3.select(svgRef.current).selectAll("*").remove();
-      createSvg(svgRef.current, data, width, height, router);
+      createSvg(svgRef.current, data, width, height, router , setShowPopup, showPopup, setPopupData);
     }
 
     constructSVG();
   }, []);
 
-  return <div id="arcDiag" ref={svgRef} />;
+  return (
+    <div>
+      <svg
+        ref={svgRef}
+        width={width}
+        height={height}
+        className="mx-auto"
+        viewBox={`0 0 ${width} ${height}`}
+      >
+        {/* your D3 code here */}
+      </svg>
+      <div
+        className={`fixed top-0 left-0 w-full h-full bg-clear bg-opacity-50 flex justify-center items-center transition-opacity ${
+          showPopup ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="bg-white rounded-md p-4">
+          <h2 className="text-lg font-bold mb-2">{popupData.appName}</h2>
+          {/* <p className="text-gray-700">Popop</p> */}
+            <Rectangle latencyData={popupData.latencyData} appName={popupData.appName} barData={popupData.barData} width={150} height={60} />
+          <div>
+            <button className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4" onClick={closePopup}>Close</button>
+            <button className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4" onClick={exploreClick}>Explore</button>
+          </div>
+        </div>
+      </div>
+    </div> 
+  )
 };
 
 export default ArcDiagram;

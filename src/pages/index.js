@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Inter } from '@next/font/google'
 import { getTraces } from '@/utils/jaeger';
 import ArcDiagram from './ArcDiagram';
+import Modal from './Modal';
 import TraceFlamegraph from './TraceFlamegraph';
 import LineChart from './LineChart';
 

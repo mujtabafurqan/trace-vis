@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.bg-gray-900 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(17, 24, 39, var(--tw-bg-opacity));
+}
+
+/* styles for the popup container */
+.bg-white {
+    --tw-bg-opacity: 1;
+    background-color: rgba(255, 255, 255, var(--tw-bg-opacity));
+}
+
+.popup-close {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: #ccc;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}  

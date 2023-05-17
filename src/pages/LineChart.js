@@ -19,8 +19,9 @@ const LineGraph = ({ data, width, height }) => {
         .range([height, 0]);
 
         // Set up axis for the x and y axis
-        const xAxis = d3.axisBottom().scale(xScale).ticks(10).tickFormat(d3.timeFormat('%I:%M %p'));
-        const yAxis = d3.axisLeft().scale(yScale).ticks(10);
+        const xAxis = d3.axisTop().scale(xScale).ticks(10).tickFormat(d3.timeFormat('%I:%M %p'));
+        const yAxis = d3.axisRight().scale(yScale).ticks(10);
+
 
         svg.selectAll('.tick line').attr('stroke', 'lightgray'); // Change the color of the tick marks
         svg.selectAll('.tick text').attr('fill', 'gray'); // Change the color of the tick labels
