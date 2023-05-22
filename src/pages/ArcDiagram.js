@@ -17,7 +17,7 @@ const getNodes = async () => {
     nodes.push({
       id: services.data[i],
       name: services.data[i],
-      component: <Rectangle latencyData={latencyData} appName={services.data[i]} barData={barData}/>,
+      component: <Rectangle latencyData={latencyData} appName={services.data[i]} barData={barData} height={50}/>,
     });
   }
   return nodes;
@@ -49,8 +49,6 @@ const createSvg = async (container, data, width, height, router, setShowPopup, s
             .attr("transform",
                 "translate(" + margin.left + "," + margin.top + ")");
 
-        // Read dummy data
-        // const dummyData = await d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json")
         const dummyData = data;
 
         console.log("D3 Json",dummyData);
@@ -59,7 +57,7 @@ const createSvg = async (container, data, width, height, router, setShowPopup, s
 
         // A linear scale to position the nodes on the X axis
         var x = d3.scalePoint()
-            .range([0, height])
+            .range([0, height*0.7])
             .domain(allNodes)
 
         // Add the circle for the nodes
@@ -68,11 +66,11 @@ const createSvg = async (container, data, width, height, router, setShowPopup, s
             .data(dummyData.nodes)
             .enter()
             .append("foreignObject")
-            .attr("x", (width/2)-75)
+            .attr("x", (width/2)-500)
             .attr("y", function(d){ return(x(d.name))})
             .attr("class", "component")
             .attr("width", 70)
-            .attr("height", 50)
+            .attr("height", 52)
             .attr("class", "component cursor-pointer")
             .html((d) => ReactDOMServer.renderToString(d.component))
             .on("click", async function(d, i) {
@@ -91,7 +89,7 @@ const createSvg = async (container, data, width, height, router, setShowPopup, s
             .data(dummyData.nodes)
             .enter()
             .append("text")
-            .attr("x", 270)
+            .attr("x", 100)
             .attr("y", function(d){ return((x(d.name)))+30})
             .text(function(d){ return(d.name)})
             .style("text-anchor", "middle")
@@ -113,11 +111,11 @@ const createSvg = async (container, data, width, height, router, setShowPopup, s
             .attr('d', function (d) {
                 const start = x(idToNode[d.source].name)    // Y position of start node on the Y axis
                 const end = x(idToNode[d.target].name)      // Y position of end node
-                return ['M', 465, start+30,    // the arc starts at the coordinate x=30, y=start (where the starting node is)
+                return ['M', 290, start+30,    // the arc starts at the coordinate x=30, y=start (where the starting node is)
                         'A',                            // This means we're gonna build an elliptical arc
                         (end - start)/2, ',',    // Next 2 lines are the coordinates of the inflexion point. Width of this point is proportional with end - start distance
                         (end - start)/2, 0, 0, ',',
-                        start < end ? 1 : 0, 465, ',', end+30] // We always want the arc on left. So if end is before start, putting 0 here turn the arc to the left.
+                        start < end ? 1 : 0, 290, ',', end+30] // We always want the arc on left. So if end is before start, putting 0 here turn the arc to the left.
                         .join(' ');
             })
             .style("fill", "none")
@@ -126,7 +124,7 @@ const createSvg = async (container, data, width, height, router, setShowPopup, s
       }
   
 
-const ArcDiagram = ({ data ={}, width = 1200, height = 1000 }) => {
+const ArcDiagram = ({ data ={}, width = 1200, height = 1500 }) => {
   const router = useRouter();
   const svgRef = useRef();
   const [showPopup, setShowPopup] = useState(false);
@@ -155,15 +153,30 @@ const ArcDiagram = ({ data ={}, width = 1200, height = 1000 }) => {
 
   return (
     <div>
-      <svg
-        ref={svgRef}
-        width={width}
-        height={height}
-        className="mx-auto"
-        viewBox={`0 0 ${width} ${height}`}
-      >
-        {/* your D3 code here */}
-      </svg>
+      <div className="flex">
+        <div className='w-5/6'>
+          <svg
+            ref={svgRef}
+            width={width}
+            height={height}
+            className="mx-auto"
+            viewBox={`0 0 ${width} ${height}`}
+          >
+          </svg>
+        </div>
+        <div className='flex justify-center items-center w-1/6 h-full py-50'>
+          <div className="absolute top-0 right-0 mt-4 mr-4 flex flex-col gap-2">
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-blue-800 mr-2"></div>
+              <span className="text-sm">Request Rate Over last One Hour</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-red-600 mr-2"></div>
+              <span className="text-sm">Latencies Over last One Hour</span>
+            </div>
+          </div>
+        </div>
+      </div>
       <div
         className={`fixed top-0 left-0 w-full h-full bg-clear bg-opacity-50 flex justify-center items-center transition-opacity ${
           showPopup ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
@@ -172,10 +185,10 @@ const ArcDiagram = ({ data ={}, width = 1200, height = 1000 }) => {
         <div className="bg-white rounded-md p-4">
           <h2 className="text-lg font-bold mb-2">{popupData.appName}</h2>
           {/* <p className="text-gray-700">Popop</p> */}
-            <Rectangle latencyData={popupData.latencyData} appName={popupData.appName} barData={popupData.barData} width={150} height={60} />
+            <Rectangle latencyData={popupData.latencyData} appName={popupData.appName} barData={popupData.barData} width={350} height={200} />
           <div>
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4" onClick={closePopup}>Close</button>
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4" onClick={exploreClick}>Explore</button>
+            <button className="bg-blue-500 text-white px-10 py-2 rounded-md mt-4 mx-8" onClick={closePopup}>Close</button>
+            <button className="bg-blue-500 text-white px-10 py-2 rounded-md mt-4" onClick={exploreClick}>Explore</button>
           </div>
         </div>
       </div>
