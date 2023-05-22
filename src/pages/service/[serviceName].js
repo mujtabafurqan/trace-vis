@@ -51,7 +51,7 @@ const Service = () => {
         </div>
 
         <div class="mt-32">
-            <div class="px-4 sm:px-8 max-w-5xl m-auto">
+            <div class="px-4 sm:px-8 max-w-10xl m-auto">
             <h1 class="text-center font-semibold text-sm">{serviceName}'s Last 20 Traces</h1>
             <ul class="border border-gray-200 rounded overflow-hidden shadow-md">
                 {items.map((item, index) => (
